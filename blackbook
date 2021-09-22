@@ -1,0 +1,194 @@
+def DisplayContacts(contacts):
+    """A function that returns all the people currently in the blackbook"""
+
+    print("\nThese are the contacts in the blackbook:")
+    for n in contacts:
+        print(n, end = "")
+        for x in contacts[n].keys():
+            print(f"{x}:", contacts[n][x], end = ",\t")
+        print("")
+
+    
+
+
+def AddContact(contacts):
+    """Function to add a contact to the blackbook"""
+    n=0
+    print("Add Name and Number")
+    dic_length = len(contacts)
+    is_in_contacts = False
+    name = input("Name: ").lower()
+    for n in contacts:
+        if name in contacts[n][''].lower():
+            is_in_contacts = True
+            while True:
+                new_number_choice = input("This person is already in your contacts, would you like to add a new number instead (yes, no)?: ")
+                if new_number_choice.lower() not in ['yes', 'no', 'y', 'n']:
+                    print("Incorrect input, try again")
+                elif new_number_choice.lower() in ['yes', 'y']:
+                    AddNumber(contacts, n, name, dic_length, is_in_contacts)
+                    break
+                else:
+                    break
+    if is_in_contacts == False:
+        AddNumber(contacts, n, name, dic_length, is_in_contacts)
+
+def AddNumber(contacts, n, name, dic_length, is_in_contacts):
+    """Function to add a number"""
+    global removed_contacts
+    while True:
+        number_type = input("What type of number do you want to add (fax, home, work, mobile)?: ")
+        if number_type.lower() in ['fax', 'home', 'work', 'mobile']:
+            break
+        else:
+            print("Incorrect input, try again")
+    phone = input("Number: ")
+    while True:
+        if is_in_contacts == True:
+            contacts[n][f'{number_type}'] = phone   
+            break
+        else:
+            for n in range (0, dic_length+1):
+                if n not in contacts.keys():
+                    new_value = n
+                    break
+            contacts[new_value] = {}
+            contacts[new_value][''] = name.capitalize()
+            contacts[new_value][f'{number_type}'] = phone
+            break
+
+
+def FindContact(contacts):    
+    """Function that searches for a contact in the blackbook"""
+    found_contact = False
+    while True:    
+        search_option = input(search_options)
+        if search_option not in ['1','2']:
+            print("invalid input, please try again")
+            continue
+        else: 
+            break
+    if search_option == '1':
+        found_contact, n, x = CompareNames(contacts)
+    if search_option == '2':
+        found_contact, n, x = CompareNumbers(contacts)
+
+    if found_contact:
+        print("\nFound", end = "")
+        for x in contacts[n].keys():
+            print(f"{x}:", contacts[n][x], end = ",\t")
+        print("\n")
+    else:
+        print("\nThis person is not in your blackbook.")
+
+def RemoveContact(contacts):
+    """Function that removes a contact from the blackbook"""
+    print("Who do you want to delete?")
+    found_contact, n, x = CompareNames(contacts)
+
+    if found_contact:
+        print(f"\n{contacts[n]['']} has been deleted from your blackbook.")
+        del contacts[n]
+    else:
+        print("\nThis person is not in your blackbook.")
+
+
+def CompareNames(contacts):
+    """Function that compares a search query to the names in the blackbook"""
+    found_contact = False
+    search_query = input("Please enter a name: ")
+    for n in contacts:
+        for x in contacts[n].keys():       
+            if type(contacts[n][x]) == str:
+                if (contacts[n][x]).lower() == (search_query).lower():
+                    found_contact = True
+                    break
+        if found_contact:
+            break
+    return found_contact, n, x
+
+def RemoveWhitespace(input):
+    """function that removes extra whitespace from phone numbers"""
+    return input.replace(" ", "")
+
+def CompareNumbers(contacts):
+    """function that compares a number to the numbers within the blackbook"""
+    found_contact = False
+    search_query = input("Please enter a number: ")
+    number2 = RemoveWhitespace(search_query)
+    for n in range(0, len(contacts)):
+        for x in contacts[n].keys():
+            number1 = RemoveWhitespace(contacts[n][x])
+            if (number1) == (number2):
+                found_contact = True
+                break
+        if found_contact:
+            break
+    return found_contact, n, x
+
+def RemoveWhitespace(input):
+    return str(input).replace(" ", "")
+
+
+contact_options = """Please select of the following options:
+1. Display contacts
+2. Add a contact
+3. Find a contact
+4. Remove a contact
+0. Exit application
+Please choose an option: """
+
+not_number_error = """ERROR: Selection is not a number.
+Please choose an option: """
+
+number_error = """ERROR: Number is not between 0 and 4.
+Please choose an option: """
+
+search_options = """How do you want to search for a contact?
+Please select of the following options:
+1. Search by name
+2. Search by phone number
+Please choose an option: """
+
+
+def main():
+    contacts = {
+        0: {'': 'David', 'mobile': 34059304850, 'home': 92034829038},
+        1: {'': 'Harry', 'work': 34098230948},
+        2: {'': 'Henk', 'home': 23094823098}
+        }
+
+    print("*** Welcome to your blackbook ***")
+    while True:
+        num_contacts = len(contacts.keys())
+        print(f"\nYou have {num_contacts} contacts in your blackbook")
+        user_input = input(contact_options)
+        while True:
+            if user_input.isdigit() is not True:
+                user_input = input(not_number_error)
+            elif int(user_input) < 0 or int(user_input) > 4:
+                user_input = input(number_error)
+            else:
+                break
+        
+        user_input = int(user_input)
+
+        if user_input == 0:
+            break
+
+        elif user_input == 1:
+            DisplayContacts(contacts)
+
+        elif user_input == 2:
+            AddContact(contacts)
+
+        elif user_input == 3:
+            FindContact(contacts)
+
+        else:
+            RemoveContact(contacts)
+
+if __name__ == "__main__":
+    main()
+
+        
